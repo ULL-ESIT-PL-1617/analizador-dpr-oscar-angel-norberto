@@ -36,6 +36,44 @@ Norberto García Gazpar http://alu0100611519.github.io/
     7.  expression → term ( ADDOP term) *  
     8.  term → factor (MULOP factor) *
     9.  factor → '(' expression ')' | NUM | ID
+    
+###Ejemplo 1
+
+    const pi = 3.14;
+    var a;
+    begin 
+        a = 4;
+        if a ==4 then a = 4 / 2
+    end.
+
+###Ejemplo 2
+
+    const pi = 3.14;
+    var a;
+    a = pi.
+
+###Ejemplo 3
+
+    procedure b
+    begin
+    var b;
+     b = b * 2
+    end
+    call b.
+
+###Ejemplo 4
+
+    var x;
+    begin     
+        a = 0;
+        while x <= 10 do
+        begin
+         
+          x = x + 1
+        end;
+        while x != 0 do
+            x = x - 1
+    end.
 
 ### Recursos
 
