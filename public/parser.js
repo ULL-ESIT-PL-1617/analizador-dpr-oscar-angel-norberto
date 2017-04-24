@@ -36,15 +36,15 @@
     };
     RESERVED_WORD = {
       "if": "IF",
-      then: "THEN",
-      while: "WHILE",
-      do: "DO",
-      call: "CALL",
-      begin: "BEGIN",
-      end: "END",
-      const: "CONST",
-      var: "VAR",
-      procedure: "PROCEDURE"
+      "then": "THEN",
+      "while": "WHILE",
+      "do": "DO",
+      "call": "CALL",
+      "begin": "BEGIN",
+      "end": "END",
+      "const": "CONST",
+      "var": "VAR",
+      "procedure": "PROCEDURE"
     };
     make = function(type, value) {
       return {
@@ -103,11 +103,11 @@
   };
 
   var parse = function(input) {
-    var condition, expression, factor, lookahead, match, statement, statements, term, tokens, tree;
+    var condition, expression, factor, lookahead, match, statement, term, declarations, tokens, program, tree;
     var functions, block;
     tokens = input.tokens();
     lookahead = tokens.shift();
-    match = function(t) {
+    match = function(t){
       if (lookahead.type === t) {
         lookahead = tokens.shift();
         if (typeof lookahead === "undefined") {
@@ -116,6 +116,100 @@
       } else {
         throw ("Syntax Error. Expected " + t + " found '") + lookahead.value + "' near '" + input.substr(lookahead.from) + "'";
       }
+    };
+    
+    program = function() {
+      var result;
+      
+      if (lookahead && lookahead.type != "undefined") {
+       result = block();
+       if(lookahead.type === "."){
+         match(".");
+       }
+       else{
+         throw ("Syntax Error. Expected '.' found '") + lookahead.value + "' near '" + input.substr(lookahead.from) + "'";
+       }
+      }
+      
+      return result;
+    };
+    
+    block = function() {
+      var declarat, result, funct, statem;
+      declarat = [];
+      funct = [];
+      result = {};
+      
+      while (lookahead && (lookahead.type === "CONST" || lookahead.type === "VAR")) {
+        declarat.push(declarations());
+      }
+      while (lookahead && lookahead.type === "PROCEDURE") {
+        funct.push(functions());
+      }
+      statem = statement();
+      
+      result = {
+        declarations: declarat,
+        functions: funct,
+        statments: statem
+      };
+      return result;
+    };
+    
+     declarations = function() {
+      var result, id, num, array;
+      result = {};
+      array = [];
+      
+      if (lookahead && (lookahead.type === "CONST")) {
+        match("CONST");
+        id = lookahead.value;
+        match("ID");
+        match("=");
+        num = lookahead.value;
+        match("NUM");
+        array.push({
+          type: "CONST",
+          id: id,
+          value: num
+        });
+        while (lookahead && (lookahead.type === ",")){
+          match(",");
+          id = lookahead.value;
+          match("ID");
+          match("=");
+          num = lookahead.value;
+          match("NUM");
+          array.push({
+            type: "CONST",
+            id: id,
+            value: num
+          });
+        }
+        match(";");
+      }
+      if (lookahead && (lookahead.type === "VAR")) {
+        match("VAR");
+        id = lookahead.value;
+        match("ID");
+        array.push({
+          type: "VAR",
+          id: id
+        });
+        while (lookahead && (lookahead.value === ',')){
+          match("ONECHAROPERATORS");
+          match("VAR");
+          id = lookahead.value;
+          match("ID");
+          array.push({
+            type: "VAR",
+            id: id
+          });
+        }
+        match(";");
+      }
+      result = array;
+      return result;
     };
     
     functions = function() {
@@ -138,10 +232,10 @@
         });
       }
       
-      result["functions"] = array;
+      result = array;
       
-      return result
-    }
+      return result;
+    };
     
     statement = function() {
       var left, result, right;
@@ -280,7 +374,7 @@
       return result;
     };
 
-    tree = statement(input);
+    tree = program(input);
     if (lookahead != null) {
       throw "Syntax Error parsing statements. " + "Expected 'end of input' and found '" + input.substr(lookahead.from) + "'";
     }
