@@ -15,13 +15,24 @@
     test('Multiplications are parsed correctly', () => {
       var result = parse('4*2');
       console.log(result);
-      assert.deepEqual(result, {type: "*", 
-                                left: { type: "NUM", value: 4}, 
+      assert.deepEqual(result, {type: "*",
+                                left: { type: "NUM", value: 4},
                                 right: {type: "NUM", value: 2}
       });
     });
     test('Bad expressions throw exceptions', () => {
       assert.throws(() => parse('3 + (4+2))'), /Syntax\s+Error/i);
+    });
+
+    test('comma correctly', () => {
+
+      var result = parse('3 + (4+2), 3 * 2');
+      assert.deepEqual(result, {type: "*",
+                                left: { type: "NUM", value: 3},
+                                right: {type: "NUM", value: 2}
+      });
+
+    )
     });
   });
 }).call(this);
